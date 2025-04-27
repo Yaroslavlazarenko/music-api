@@ -8,10 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="8.1.1" />
-        <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.3" />
-        <PackageReference Include="MediatR" Version="8.1.0" />
+        <PackageReference Include="AutoMapper" Version="12.0.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+        <PackageReference Include="MediatR" Version="12.5.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.14"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.15">
@@ -21,14 +25,25 @@
         <PackageReference Include="Npgsql" Version="8.0.7" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Configurations\" />
-      <Folder Include="Controllers\" />
       <Folder Include="DTOs\" />
+      <Folder Include="Mappings\" />
       <Folder Include="Migrations\" />
-      <Folder Include="Services\" />
+      <Folder Include="Services\Genres\Commands\" />
+      <Folder Include="Services\Genres\Queries\" />
+      <Folder Include="Services\Performers\Commands\" />
+      <Folder Include="Services\Performers\Queries\" />
+      <Folder Include="Services\Playlists\Commands\" />
+      <Folder Include="Services\Playlists\Queries\" />
+      <Folder Include="Services\Songs\Commands\" />
+      <Folder Include="Services\Songs\Queries\" />
+      <Folder Include="Services\Users\Commands\" />
+      <Folder Include="Services\Users\Queries\" />
+      <Folder Include="Validators\" />
     </ItemGroup>
 
 </Project>
