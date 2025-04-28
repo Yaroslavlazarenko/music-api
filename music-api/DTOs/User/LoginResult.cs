@@ -3,6 +3,6 @@
 public class LoginResult
 {
     public bool Success { get; set; }
-    public UserDto User { get; set; }
-    public string Token { get; set; }
+    public UserDto User { get; set; } = null!;
+    public string Token { get; set; } = null!;
 }

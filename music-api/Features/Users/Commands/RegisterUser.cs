@@ -27,6 +27,16 @@ public static class RegisterUser
 
         public async Task<RegisterResult> Handle(Command request, CancellationToken cancellationToken)
         {
+            var existingUser = await _userManager.FindByEmailAsync(request.Request.Email);
+            if (existingUser is not null)
+            {
+                return new RegisterResult
+                {
+                    Success = false,
+                    Errors = new List<string> { "Користувач з таким Email вже існує" }
+                };
+            }
+
             var user = new User
             {
                 Email = request.Request.Email,

@@ -33,7 +33,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] MyLoginRequest request)
     {
         var result = await _mediator.Send(new LoginUser.Command(request));
         

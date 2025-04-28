@@ -1,7 +1,6 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.Extensions.Options;
 using music_api.DTOs.User;
 using music_api.Entities;
@@ -11,7 +10,7 @@ namespace music_api.Features.Users.Commands;
 
 public static class LoginUser
 {
-    public record Command(LoginRequest Request) : IRequest<LoginResult>;
+    public record Command(MyLoginRequest Request) : IRequest<LoginResult>;
 
     public class Handler : IRequestHandler<Command, LoginResult>
     {
@@ -30,7 +29,7 @@ public static class LoginUser
 
         public async Task<LoginResult> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Request.Email);
+            var user = await _userManager.FindByNameAsync(request.Request.Username);
             if (user is null)
                 return new LoginResult { Success = false };
 
