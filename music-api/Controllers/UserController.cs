@@ -1,11 +1,10 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using music_api.DTOs;
-using music_api.Services.Users.Commands;
-using music_api.Services.Users.Queries;
+using music_api.DTOs.User;
+using music_api.Features.Users.Commands;
+using music_api.Features.Users.Queries;
+using RegisterRequest = music_api.DTOs.User.RegisterRequest;
 
 namespace music_api.Controllers;
 
@@ -20,10 +19,36 @@ public class UserController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAll(int page, int pageSize, CancellationToken cancellationToken)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var result = await _mediator.Send(new GetAllUsers.Query(page, pageSize), cancellationToken);
+        var result = await _mediator.Send(new RegisterUser.Command(request));
+        
+        if (!result.Success)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        return Ok(new { user = result.User, token = result.Token });
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var result = await _mediator.Send(new LoginUser.Command(request));
+        
+        if (!result.Success)
+        {
+            return Unauthorized();
+        }
+        
+        return Ok(new { user = result.User, token = result.Token });
+    }
+    
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAll([FromQuery] GetAllUsersRequestDto request, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetAllUsers.Query(request), cancellationToken);
         
         return Ok(result);
     }
@@ -32,11 +57,6 @@ public class UserController : ControllerBase
     public async Task<ActionResult<UserDto>> GetById(int id, CancellationToken cancellationToken)
     {
         var user = await _mediator.Send(new GetUserById.Query(id), cancellationToken);
-
-        if (user is null)
-        {
-            return NotFound();
-        }
         
         return Ok(user);
     }
@@ -45,22 +65,14 @@ public class UserController : ControllerBase
     public async Task<ActionResult<UserDto>> Update(int id, [FromBody] UpdateUserDto dto, CancellationToken cancellationToken)
     {
         var updated = await _mediator.Send(new UpdateUser.Command(id, dto), cancellationToken);
-        if (updated is null)
-        {
-            return NotFound();
-        }
+        
         return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var deleted = await _mediator.Send(new DeleteUser.Command(id), cancellationToken);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
+        await _mediator.Send(new DeleteUser.Command(id), cancellationToken);
         
         return NoContent();
     }

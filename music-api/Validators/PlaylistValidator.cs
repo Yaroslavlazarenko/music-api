@@ -13,9 +13,6 @@ namespace music_api.Validators
             
             RuleFor(x => x.Description)
                 .MaximumLength(1000).WithMessage("Опис не повинен перевищувати 1000 символів!");
-            
-            RuleFor(x => x.UserId)
-                .GreaterThan(0).When(x => x.UserId.HasValue).WithMessage("UserId повинен бути додатнім числом!");
         }
     }
 }

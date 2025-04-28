@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using music_api.DTOs;
-using music_api.Services.Playlists.Commands;
-using music_api.Services.Playlists.Queries;
+using music_api.DTOs.Playlist;
+using music_api.DTOs.Song;
+using music_api.Features.Playlists.Commands;
+using music_api.Features.Playlists.Queries;
 
 namespace music_api.Controllers;
 
@@ -30,13 +28,15 @@ public class PlaylistController : ControllerBase
         }
         
         var result = await _mediator.Send(new AddPlaylist.Command(dto, User), cancellationToken);
+        
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetAll(CancellationToken cancellationToken, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetAll([FromQuery] GetAllPlaylistRequestDto request, CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetAllPlaylists.Query(page, pageSize), cancellationToken);
+        var result = await _mediator.Send(new GetAllPlaylists.Query(request), cancellationToken);
+        
         return Ok(result);
     }
 
@@ -47,15 +47,13 @@ public class PlaylistController : ControllerBase
         if (User.Identity is { IsAuthenticated: true })
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             if (int.TryParse(userIdClaim, out var parsedId))
+            {
                 userId = parsedId;
+            }
         }
         var playlist = await _mediator.Send(new GetPlaylistById.Query(id, userId), cancellationToken);
-
-        if (playlist is null)
-        {
-            return NotFound();
-        }
         
         return Ok(playlist);
     }
@@ -63,15 +61,11 @@ public class PlaylistController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<PlaylistDto>> Update(int id, [FromBody] UpdatePlaylistDto dto, CancellationToken cancellationToken)
     {
-        var playlist = await _mediator.Send(new GetPlaylistById.Query(id, null), cancellationToken);
-        if (playlist is null)
-        {
-            return NotFound();
-        }
+        var playlist = await _mediator.Send(new GetPlaylistById.Query(id), cancellationToken);
         
         if (User.Identity is null || !User.Identity.IsAuthenticated)
         {
-            if (playlist.UserId is not null)
+            if (playlist!.UserId is not null)
             {
                 return Unauthorized();
             }
@@ -83,43 +77,35 @@ public class PlaylistController : ControllerBase
         else
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId) || playlist.UserId != userId)
+            if (!int.TryParse(userIdClaim, out var userId) || playlist!.UserId != userId)
             {
                 return Unauthorized();
             }
         }
 
         var updated = await _mediator.Send(new UpdatePlaylist.Command(id, dto), cancellationToken);
-        if (updated is null)
-        {
-            return NotFound();
-        }
+        
         return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var deleted = await _mediator.Send(new DeletePlaylist.Command(id), cancellationToken);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
+        await _mediator.Send(new DeletePlaylist.Command(id), cancellationToken);
         
         return NoContent();
     }
 
-    [HttpPost("{playlistId}/add-song")]
-    public async Task<ActionResult<PlaylistDto>> AddSongToPlaylist(int playlistId, int songId, CancellationToken cancellationToken)
+    [HttpPost("add-song")]
+    public async Task<ActionResult<PlaylistDto>> AddSongToPlaylist([FromBody] AddSongToPlaylistRequestDto request, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new AddSongToPlaylist.Command(playlistId, songId), cancellationToken);
-        if (result == null) return NotFound();
+        var result = await _mediator.Send(new AddSongToPlaylist.Command(request), cancellationToken);
+        
         return Ok(result);
     }
 
     [HttpGet("my")]
-    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetMyPlaylists(CancellationToken cancellationToken, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+    public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetMyPlaylists([FromQuery] GetMyPlaylistsRequestDto request, CancellationToken cancellationToken = default)
     {
         if (User.Identity is { IsAuthenticated: true })
         {
@@ -129,12 +115,14 @@ public class PlaylistController : ControllerBase
                 return Unauthorized();
             }
             var userId = int.Parse(userIdClaim);
-            var result = await _mediator.Send(new GetMyPlaylists.Query(userId, page, pageSize), cancellationToken);
+            var result = await _mediator.Send(new GetMyPlaylists.Query(userId, request), cancellationToken);
+            
             return Ok(result);
         }
         else
         {
-            var result = await _mediator.Send(new GetPublicPlaylists.Query(page, pageSize), cancellationToken);
+            var result = await _mediator.Send(new GetPublicPlaylists.Query(request), cancellationToken);
+            
             return Ok(result);
         }
     }

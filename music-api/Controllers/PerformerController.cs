@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using music_api.DTOs;
-using music_api.Services.Performers.Commands;
-using music_api.Services.Performers.Queries;
+using music_api.DTOs.Performer;
+using music_api.Features.Performers.Commands;
+using music_api.Features.Performers.Queries;
 
 namespace music_api.Controllers;
 
@@ -24,13 +21,15 @@ public class PerformerController : ControllerBase
     public async Task<ActionResult<PerformerDto>> Add([FromBody] CreatePerformerDto dto, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new AddPerformer.Command(dto), cancellationToken);
+        
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PerformerDto>>> GetAll(int page, int pageSize, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PerformerDto>>> GetAll([FromQuery] GetAllPerformersRequestDto request, CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(new GetAllPerformers.Query(page, pageSize), cancellationToken);
+        var result = await _mediator.Send(new GetAllPerformers.Query(request), cancellationToken);
+        
         return Ok(result);
     }
 
@@ -39,11 +38,6 @@ public class PerformerController : ControllerBase
     {
         var performer = await _mediator.Send(new GetPerformerById.Query(id), cancellationToken);
         
-        if (performer is null)
-        {
-            return NotFound();
-        }
-        
         return Ok(performer);
     }
 
@@ -51,22 +45,14 @@ public class PerformerController : ControllerBase
     public async Task<ActionResult<PerformerDto>> Update(int id, [FromBody] UpdatePerformerDto dto, CancellationToken cancellationToken)
     {
         var updated = await _mediator.Send(new UpdatePerformer.Command(id, dto), cancellationToken);
-        if (updated is null)
-        {
-            return NotFound();
-        }
+       
         return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var deleted = await _mediator.Send(new DeletePerformer.Command(id), cancellationToken);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
+        await _mediator.Send(new DeletePerformer.Command(id), cancellationToken);
         
         return NoContent();
     }

@@ -7,14 +7,9 @@ using music_api.Settings;
 using music_api.Contexts;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Builder;
 using music_api.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using music_api.ExceptionHandlers;
-using music_api.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,14 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Register exception handlers
-builder.Services.AddExceptionHandler<UserValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<GenreValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<PlaylistValidationExceptionHandler>(); 
-builder.Services.AddExceptionHandler<PerformerValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<SongValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
-builder.Services.AddExceptionHandler<ServerExceptionsHandler>();
-builder.Services.AddProblemDetails();
+builder.Services.AddGlobalExceptionHandlers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -82,9 +70,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
-
-// AuthService
-builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<MusicDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DB")));
 

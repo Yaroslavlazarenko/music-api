@@ -29,19 +29,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DTOs\" />
       <Folder Include="Mappings\" />
       <Folder Include="Migrations\" />
-      <Folder Include="Services\Genres\Commands\" />
-      <Folder Include="Services\Genres\Queries\" />
-      <Folder Include="Services\Performers\Commands\" />
-      <Folder Include="Services\Performers\Queries\" />
-      <Folder Include="Services\Playlists\Commands\" />
-      <Folder Include="Services\Playlists\Queries\" />
-      <Folder Include="Services\Songs\Commands\" />
-      <Folder Include="Services\Songs\Queries\" />
-      <Folder Include="Services\Users\Commands\" />
-      <Folder Include="Services\Users\Queries\" />
+      <Folder Include="Features\Genres\Commands\" />
+      <Folder Include="Features\Genres\Queries\" />
+      <Folder Include="Features\Performers\Commands\" />
+      <Folder Include="Features\Performers\Queries\" />
+      <Folder Include="Features\Playlists\Commands\" />
+      <Folder Include="Features\Playlists\Queries\" />
+      <Folder Include="Features\Songs\Commands\" />
+      <Folder Include="Features\Songs\Queries\" />
+      <Folder Include="Features\Users\Queries\" />
       <Folder Include="Validators\" />
     </ItemGroup>
 
