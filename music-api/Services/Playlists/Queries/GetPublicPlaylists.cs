@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using music_api.Contexts;
 using music_api.DTOs;
-using music_api.Entities;
 
 namespace music_api.Services.Playlists.Queries;
 
@@ -26,7 +25,7 @@ public static class GetPublicPlaylists
         {
             var query = _context.Playlists
                 .Include(p => p.User)
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
                 .Where(p => p.IsPublic)
                 .OrderBy(x => x.Title);
             

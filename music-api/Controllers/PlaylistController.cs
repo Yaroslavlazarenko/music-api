@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 using music_api.DTOs;
 using music_api.Services.Playlists.Commands;
 using music_api.Services.Playlists.Queries;
@@ -23,7 +26,6 @@ public class PlaylistController : ControllerBase
     {
         if (!dto.IsPublic && (User.Identity is null || !User.Identity.IsAuthenticated))
         {
-            // Только авторизованный может создавать приватный плейлист
             return Unauthorized();
         }
         
@@ -61,27 +63,26 @@ public class PlaylistController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<PlaylistDto>> Update(int id, [FromBody] UpdatePlaylistDto dto, CancellationToken cancellationToken)
     {
-        // Получаем плейлист для проверки
         var playlist = await _mediator.Send(new GetPlaylistById.Query(id, null), cancellationToken);
-        if (playlist == null)
+        if (playlist is null)
+        {
             return NotFound();
-
-        // Неавторизованный может работать только с ничейными плейлистами
+        }
+        
         if (User.Identity is null || !User.Identity.IsAuthenticated)
         {
-            if (playlist.UserId != null)
+            if (playlist.UserId is not null)
             {
                 return Unauthorized();
             }
-            // Неавторизованный не может делать ничейный плейлист приватным
             if (!dto.IsPublic)
             {
                 return Unauthorized();
             }
         }
-        else // авторизованный
+        else
         {
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdClaim, out var userId) || playlist.UserId != userId)
             {
                 return Unauthorized();
@@ -120,17 +121,17 @@ public class PlaylistController : ControllerBase
     [HttpGet("my")]
     public async Task<ActionResult<IEnumerable<PlaylistDto>>> GetMyPlaylists(CancellationToken cancellationToken, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
     {
-        // Если пользователь авторизован — возвращаем его плейлисты
         if (User.Identity is { IsAuthenticated: true })
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim is null)
+            {
                 return Unauthorized();
+            }
             var userId = int.Parse(userIdClaim);
             var result = await _mediator.Send(new GetMyPlaylists.Query(userId, page, pageSize), cancellationToken);
             return Ok(result);
         }
-        // Если не авторизован — возвращаем публичные плейлисты
         else
         {
             var result = await _mediator.Send(new GetPublicPlaylists.Query(page, pageSize), cancellationToken);

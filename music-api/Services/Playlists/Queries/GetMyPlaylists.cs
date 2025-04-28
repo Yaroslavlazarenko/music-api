@@ -25,7 +25,12 @@ public static class GetMyPlaylists
         {
             var query = _context.Playlists
                 .Include(p => p.User)
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
+                .ThenInclude(ps => ps.Song)
+                .ThenInclude(s => s.Performer)
+                .Include(p => p.PlaylistSongs)
+                .ThenInclude(ps => ps.Song)
+                .ThenInclude(s => s.Genre)
                 .Where(p => p.UserId == request.UserId)
                 .OrderBy(x => x.Title);
             

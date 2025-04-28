@@ -12,7 +12,7 @@ public class PlaylistConfiguration : IEntityTypeConfiguration<Playlist>
         builder.Property(p => p.Title).IsRequired().HasMaxLength(150);
         builder.Property(p => p.Description).HasMaxLength(500);
         builder.Property(p => p.CreatedAt).IsRequired();
-        builder.HasMany(p => p.Songs)
+        builder.HasMany(p => p.PlaylistSongs)
                .WithOne()
                .OnDelete(DeleteBehavior.Cascade);
     }

@@ -1,3 +1,5 @@
+using System;
+
 namespace music_api.DTOs;
 
 public class UserDto

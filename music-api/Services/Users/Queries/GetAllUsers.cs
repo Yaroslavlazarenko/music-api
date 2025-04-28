@@ -1,14 +1,19 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using music_api.DTOs;
 using music_api.Contexts;
+using music_api.Entities;
 
 namespace music_api.Services.Users.Queries;
 
 public static class GetAllUsers
 {
-    public record Query(int Page, int PageSize) : IRequest<IEnumerable<UserDto>>;
+    public record Query(int? Page = null, int? PageSize = null) : IRequest<IEnumerable<UserDto>>;
     
     public class Handler : IRequestHandler<Query, IEnumerable<UserDto>>
     {
@@ -25,12 +30,19 @@ public static class GetAllUsers
         {
             var query = _context.Users.AsQueryable();
             
-            var users = await query
-                .OrderBy(x => x.UserName)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync(cancellationToken);
-            
+            List<User> users;
+            if (request is { Page: > 0, PageSize: > 0 })
+            {
+                users = await query
+                    .OrderBy(x => x.UserName)
+                    .Skip((request.Page.Value - 1) * request.PageSize.Value)
+                    .Take(request.PageSize.Value)
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                users = await query.OrderBy(x => x.UserName).ToListAsync(cancellationToken);
+            }
             return _mapper.Map<IEnumerable<UserDto>>(users);
         }
     }

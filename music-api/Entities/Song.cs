@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace music_api.Entities;
 
 public class Song
@@ -15,4 +18,6 @@ public class Song
     public string? Album { get; set; }
     public int? Year { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public ICollection<PlaylistSong> PlaylistSongs { get; set; }
 }

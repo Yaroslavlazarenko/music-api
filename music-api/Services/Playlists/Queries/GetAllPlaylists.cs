@@ -8,7 +8,7 @@ namespace music_api.Services.Playlists.Queries;
 
 public static class GetAllPlaylists
 {
-    public record Query(int? Page = null, int? PageSize = null) : IRequest<IEnumerable<PlaylistDto>>;
+    public record Query(int? UserId = null, int? Page = null, int? PageSize = null) : IRequest<IEnumerable<PlaylistDto>>;
     
     public class Handler : IRequestHandler<Query, IEnumerable<PlaylistDto>>
     {
@@ -23,21 +23,26 @@ public static class GetAllPlaylists
         
         public async Task<IEnumerable<PlaylistDto>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var userIdClaim = (request as dynamic)?.UserId as int?;
             var query = _context.Playlists
                 .Include(p => p.User)
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
+                .ThenInclude(ps => ps.Song)
+                    .ThenInclude(s => s.Performer)
+                .Include(p => p.PlaylistSongs)
+                .ThenInclude(ps => ps.Song)
+                    .ThenInclude(s => s.Genre)
                 .AsQueryable();
             
-            if (userIdClaim.HasValue)
+            if (request.UserId.HasValue)
             {
-                var userId = userIdClaim.Value;
+                var userId = request.UserId.Value;
                 query = query.Where(p => p.IsPublic || (p.UserId != null && p.UserId == userId));
             }
             else
             {
                 query = query.Where(p => p.IsPublic);
             }
+            
             if (request is { Page: > 0, PageSize: > 0 })
             {
                 query = query.OrderBy(x => x.Title)

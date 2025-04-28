@@ -25,7 +25,7 @@ public static class UpdatePlaylist
         public async Task<PlaylistDto?> Handle(Command request, CancellationToken cancellationToken)
         {
             var playlist = await _context.Playlists
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
                 .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
 
             if (playlist is null)

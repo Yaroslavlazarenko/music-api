@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace music_api.Entities;
 
 public class Playlist
@@ -9,5 +12,5 @@ public class Playlist
     public User? User { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool IsPublic { get; set; }
-    public ICollection<Song> Songs { get; set; }
+    public ICollection<PlaylistSong> PlaylistSongs { get; set; }
 }

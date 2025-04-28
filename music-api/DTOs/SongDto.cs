@@ -1,3 +1,5 @@
+using System;
+
 namespace music_api.DTOs;
 
 public class SongDto
@@ -12,7 +14,6 @@ public class SongDto
     /// Час у секундах
     /// </summary>
     public int Duration { get; set; }
-    public int? AlbumId { get; set; }
     public int? Year { get; set; }
     public DateTime CreatedAt { get; set; }
 }

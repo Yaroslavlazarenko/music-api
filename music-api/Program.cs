@@ -7,8 +7,12 @@ using music_api.Settings;
 using music_api.Contexts;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using music_api.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using music_api.ExceptionHandlers;
 using music_api.Services.Auth;
 
@@ -89,13 +93,10 @@ builder.Services.AddIdentity<User, IdentityRole<int>>()
     .AddEntityFrameworkStores<MusicDbContext>()
     .AddDefaultTokenProviders();
 
-// AutoMapper: регистрируем все профили в сборке
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-// MediatR: регистрируем все Handler'ы
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-// FluentValidation: регистрируем все валидаторы
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 builder.Services.AddFluentValidationAutoValidation();
 

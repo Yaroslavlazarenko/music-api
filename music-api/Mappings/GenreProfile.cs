@@ -11,9 +11,11 @@ public class GenreProfile : Profile
         CreateMap<Genre, GenreDto>();
         
         CreateMap<GenreDto, Genre>();
-CreateMap<CreateGenreDto, Genre>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore());
-CreateMap<UpdateGenreDto, Genre>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore());
+        
+        CreateMap<CreateGenreDto, Genre>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        
+        CreateMap<UpdateGenreDto, Genre>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

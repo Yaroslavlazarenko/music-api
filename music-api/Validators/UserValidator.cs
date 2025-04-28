@@ -8,7 +8,7 @@ namespace music_api.Validators
         public UserValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("Email не может быть пустым!")
+                .NotEmpty().WithMessage("Email не може бути порожнім!")
                 .EmailAddress().WithMessage("Некоректний email!");
             
             RuleFor(x => x.UserName)

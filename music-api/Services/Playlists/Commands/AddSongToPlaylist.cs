@@ -5,6 +5,8 @@ using music_api.DTOs;
 using music_api.Contexts;
 using music_api.Exceptions;
 
+using music_api.Entities;
+
 namespace music_api.Services.Playlists.Commands;
 
 public static class AddSongToPlaylist
@@ -25,7 +27,8 @@ public static class AddSongToPlaylist
         public async Task<PlaylistDto?> Handle(Command request, CancellationToken cancellationToken)
         {
             var playlist = await _context.Playlists
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
+                .ThenInclude(ps => ps.Song)
                 .FirstOrDefaultAsync(p => p.Id == request.PlaylistId, cancellationToken);
 
             if (playlist is null)
@@ -36,7 +39,7 @@ public static class AddSongToPlaylist
             }
             
             var song = await _context.Songs
-                .FindAsync([request.SongId], cancellationToken);
+                .FindAsync(new object[] { request.SongId }, cancellationToken);
 
             if (song is null)
             {
@@ -45,9 +48,9 @@ public static class AddSongToPlaylist
                 ]);
             }
 
-            if (playlist.Songs.All(s => s.Id != song.Id))
+            if (playlist.PlaylistSongs.All(ps => ps.SongId != song.Id))
             {
-                playlist.Songs.Add(song);
+                playlist.PlaylistSongs.Add(new PlaylistSong { PlaylistId = playlist.Id, SongId = song.Id });
             }
             
             await _context.SaveChangesAsync(cancellationToken);

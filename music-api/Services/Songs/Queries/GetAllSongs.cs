@@ -3,12 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using music_api.DTOs;
 using music_api.Contexts;
 using AutoMapper;
+using music_api.Entities;
 
 namespace music_api.Services.Songs.Queries;
 
 public static class GetAllSongs
 {
-    public record Query(int Page, int PageSize, int? PerformerId, int? GenreId) : IRequest<IEnumerable<SongDto>>;
+    public record Query(int? Page = null, int? PageSize = null, int? PerformerId = null, int? GenreId = null) : IRequest<IEnumerable<SongDto>>;
     
     public class Handler : IRequestHandler<Query, IEnumerable<SongDto>>
     {
@@ -39,13 +40,20 @@ public static class GetAllSongs
                 query = query
                     .Where(x => x.GenreId == request.GenreId);
             }
-            
-            var songs = await query
-                .OrderBy(x => x.Title)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync(cancellationToken);
-            
+
+            List<Song> songs;
+            if (request is { Page: > 0, PageSize: > 0 })
+            {
+                songs = await query
+                    .OrderBy(x => x.Title)
+                    .Skip((request.Page.Value - 1) * request.PageSize.Value)
+                    .Take(request.PageSize.Value)
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                songs = await query.OrderBy(x => x.Title).ToListAsync(cancellationToken);
+            }
             return _mapper.Map<IEnumerable<SongDto>>(songs);
         }
     }

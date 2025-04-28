@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace music_api.Entities;
 
 public class Performer

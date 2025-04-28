@@ -9,16 +9,15 @@ public class PlaylistProfile : Profile
     public PlaylistProfile()
     {
         CreateMap<Playlist, PlaylistDto>()
-            .ForMember(d => d.Songs, opt => opt.MapFrom(s => s.Songs))
-            .ForMember(d => d.TotalDuration, opt => opt.MapFrom(s => s.Songs != null ? s.Songs.Sum(song => song.Duration) : 0));
+            .ForMember(dest => dest.Songs, opt => opt.MapFrom(src => src.PlaylistSongs.Select(ps => ps.Song)))
+            .ForMember(d => d.TotalDuration, opt => opt.MapFrom(s => s.PlaylistSongs.Sum(ps => ps.Song.Duration)));
         
-        CreateMap<PlaylistDto, Playlist>()
-            .ForMember(d => d.Songs, opt => opt.Ignore());
+        CreateMap<PlaylistDto, Playlist>();
         
         CreateMap<CreatePlaylistDto, Playlist>()
-            .ForMember(d => d.Songs, opt => opt.Ignore());
+            .ForMember(d => d.PlaylistSongs, opt => opt.Ignore());
         
         CreateMap<UpdatePlaylistDto, Playlist>()
-            .ForMember(d => d.Songs, opt => opt.Ignore());
+            .ForMember(d => d.PlaylistSongs, opt => opt.Ignore());
     }
 }

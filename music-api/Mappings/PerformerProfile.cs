@@ -11,11 +11,13 @@ public class PerformerProfile : Profile
         CreateMap<Performer, PerformerDto>();
         
         CreateMap<PerformerDto, Performer>();
-CreateMap<CreatePerformerDto, Performer>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore())
-    .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
-CreateMap<UpdatePerformerDto, Performer>()
-    .ForMember(dest => dest.Id, opt => opt.Ignore())
-    .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+        
+        CreateMap<CreatePerformerDto, Performer>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
+        
+        CreateMap<UpdatePerformerDto, Performer>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
     }
 }

@@ -26,7 +26,8 @@ public static class GetPlaylistById
         {
             var playlist = await _context.Playlists
                 .Include(p => p.User)
-                .Include(p => p.Songs)
+                .Include(p => p.PlaylistSongs)
+                    .ThenInclude(ps => ps.Song)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (playlist is null)
